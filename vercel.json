@@ -1,15 +1,25 @@
 {
   "version": 2,
-  "name": "cyclecare-admin-pwa",
-  "routes": [
+  "public": true,
+  "rewrites": [
     {
-      "src": "/sw.js",
-      "headers": { "cache-control": "no-cache" },
-      "dest": "/sw.js"
+      "source": "/",
+      "destination": "/index.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
   ]
 }
