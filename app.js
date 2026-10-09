@@ -1003,6 +1003,75 @@ function setupExportImport() {
 // --- 11. PWA Registration & Install Handler ---
 let deferredPrompt = null;
 
+// --- 12. Payment Gateway & Complex Chat Reviews ---
+const PAYMENT_DATA = {
+  activeGateway: localStorage.getItem('cyclecare_active_gateway') || 'PAYHERO',
+  transactions: [
+    { id: 'tx_mp_9101', user: 'sarah.m@gmail.com', phone: '+254712***789', amount: 'KES 49', provider: 'PAYHERO', status: 'COMPLETED', coins: 80, time: '10 mins ago' },
+    { id: 'tx_mp_9102', user: 'faith.k@yahoo.com', phone: '+254722***456', amount: 'KES 99', provider: 'PAYHERO', status: 'COMPLETED', coins: 190, time: '25 mins ago' },
+    { id: 'tx_mp_9103', user: 'amina.o@outlook.com', phone: '+254733***112', amount: 'KES 149', provider: 'PAYHERO', status: 'COMPLETED', coins: 310, time: '1 hour ago' },
+    { id: 'tx_mp_9104', user: 'grace.w@gmail.com', phone: '+254701***990', amount: 'KES 49', provider: 'PAYNEXUS', status: 'PENDING', coins: 80, time: '2 hours ago' }
+  ],
+  complexChatReviews: [
+    { id: 'rev_01', time: '15 mins ago', user: 'mary.n@gmail.com', query: 'I had heavy cramping after skipping my pill 3 days ago and feeling dizzy', category: 'Clinical Clarification', status: 'Pending Review' },
+    { id: 'rev_02', time: '40 mins ago', user: 'lucy.w@gmail.com', query: 'why did my mpesa take long and also is spotty brownish blood normal midcycle', category: 'Mixed Multi-Intent', status: 'Auto-Disambiguated' },
+    { id: 'rev_03', time: '3 hours ago', user: 'esther.k@gmail.com', query: 'felt sharp lower left twinges for 2 hours yesterday during intercourse', category: 'Physiological Inquiry', status: 'Pending Review' }
+  ]
+};
+
+function setupPaymentsTab() {
+  const selectGateway = document.getElementById('select-active-gateway');
+  if (selectGateway) {
+    selectGateway.value = PAYMENT_DATA.activeGateway;
+    selectGateway.addEventListener('change', (e) => {
+      PAYMENT_DATA.activeGateway = e.target.value;
+      localStorage.setItem('cyclecare_active_gateway', e.target.value);
+      showToast(`Active M-Pesa Gateway switched to ${e.target.value}`);
+    });
+  }
+
+  document.getElementById('btn-save-gateway-config')?.addEventListener('click', () => {
+    const gw = selectGateway ? selectGateway.value : 'PAYHERO';
+    localStorage.setItem('cyclecare_active_gateway', gw);
+    showToast(`Payment configuration saved! Primary gateway: ${gw}`);
+  });
+
+  document.getElementById('btn-refresh-transactions')?.addEventListener('click', renderTransactions);
+  renderTransactions();
+  renderCareReviews();
+}
+
+function renderTransactions() {
+  const tbody = document.getElementById('tbody-transactions');
+  if (!tbody) return;
+  tbody.innerHTML = PAYMENT_DATA.transactions.map(tx => `
+    <tr>
+      <td><code>${tx.id}</code></td>
+      <td>${tx.user}</td>
+      <td>${tx.phone}</td>
+      <td><strong>${tx.amount}</strong></td>
+      <td><span class="badge" style="background: rgba(0,166,81,0.2); color:#4CAF50;">${tx.provider}</span></td>
+      <td><span class="badge" style="background: ${tx.status === 'COMPLETED' ? 'rgba(0,200,83,0.2)' : 'rgba(255,152,0,0.2)'}; color: ${tx.status === 'COMPLETED' ? '#00E676' : '#FFB74D'};">${tx.status}</span></td>
+      <td style="color:#F3B748; font-weight:600;">+${tx.coins} Coins</td>
+    </tr>
+  `).join('');
+}
+
+function renderCareReviews() {
+  const tbody = document.getElementById('tbody-care-reviews');
+  if (!tbody) return;
+  tbody.innerHTML = PAYMENT_DATA.complexChatReviews.map(rev => `
+    <tr>
+      <td style="font-size:12px; color:var(--text-dim);">${rev.time}</td>
+      <td>${rev.user}</td>
+      <td style="max-width:320px; font-style:italic;">"${rev.query}"</td>
+      <td><span class="badge" style="background: rgba(226,115,150,0.2); color:#E27396;">${rev.category}</span></td>
+      <td><span class="badge" style="background: ${rev.status === 'Pending Review' ? 'rgba(255,193,7,0.2)' : 'rgba(76,175,80,0.2)'}; color: ${rev.status === 'Pending Review' ? '#FFD54F' : '#81C784'};">${rev.status}</span></td>
+      <td><button class="btn btn-outline" style="padding:4px 8px; font-size:11px;" onclick="showToast('Care reflection recorded for ${rev.user}')">Mark Reviewed</button></td>
+    </tr>
+  `).join('');
+}
+
 function setupPWA() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -1048,6 +1117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAuditLogs();
   setupUserModal();
   setupAIDrawer();
+  setupPaymentsTab();
   setupExportImport();
   setupPWA();
 

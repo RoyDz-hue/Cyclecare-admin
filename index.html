@@ -88,6 +88,13 @@
           </a>
         </li>
         <li>
+          <a class="nav-item" data-tab="tab-payments">
+            <span class="nav-icon">💳</span>
+            <span>Payments & Gateway</span>
+            <span class="badge" style="background: rgba(0,166,81,0.3); color:#4CAF50;">M-Pesa</span>
+          </a>
+        </li>
+        <li>
           <a class="nav-item" data-tab="tab-ai">
             <span class="nav-icon">✨</span>
             <span>Layered AI Config</span>
@@ -553,6 +560,109 @@
                   </tr>
                 </thead>
                 <tbody id="tbody-flags">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: PAYMENTS & GATEWAY ================= -->
+        <div class="tab-pane" id="tab-payments">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">💳 Payment Gateway & M-Pesa STK Configuration</div>
+                <div class="card-subtitle">Manage primary M-Pesa provider (PayHero vs. PayNexus toggle) and crypto gateways</div>
+              </div>
+              <button class="btn btn-gold" id="btn-save-gateway-config">Save Gateway Settings</button>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Active Primary M-Pesa Provider</label>
+                <select class="form-control" id="select-active-gateway">
+                  <option value="PAYHERO" selected>PayHero (Launch Default — Fast STK Push)</option>
+                  <option value="PAYNEXUS">PayNexus (Enterprise Fallback / Switchover)</option>
+                </select>
+                <small style="color: var(--text-dim); margin-top: 4px;">Controls which provider Edge Function routes live STK Push requests to</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Secondary Crypto Gateway (OKX)</label>
+                <select class="form-control" id="select-okx-status">
+                  <option value="ACTIVE" selected>Enabled (USDT / USDC Webhook Verification)</option>
+                  <option value="DISABLED">Disabled (M-Pesa Only Mode)</option>
+                </select>
+                <small style="color: var(--text-dim); margin-top: 4px;">Allows users to settle Coin packages using OKX Web3 Pay</small>
+              </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 16px;">
+              <div class="form-group">
+                <label class="form-label">PayHero API Channel / Key</label>
+                <input type="text" class="form-control" id="input-payhero-key" value="ph_live_992481028472">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Webhook Callback URL</label>
+                <input type="text" class="form-control" value="https://apjqcocxtylsofgxhetb.supabase.co/functions/v1/payment-webhook" readonly>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Transactions & Verification Log -->
+          <div class="card" style="margin-top: 24px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📜 Recent Transactions & Settlement Ledger</div>
+                <div class="card-subtitle">Edge Function verified STK Push callbacks with atomic coin credits</div>
+              </div>
+              <button class="btn btn-outline" id="btn-refresh-transactions">Refresh Ledger</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Tx ID</th>
+                    <th>User ID</th>
+                    <th>Phone</th>
+                    <th>Amount</th>
+                    <th>Provider</th>
+                    <th>Status</th>
+                    <th>Coins Credited</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-transactions">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Silent AI Disambiguation & Complex Chat Review Queue -->
+          <div class="card" style="margin-top: 24px;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🏥 Complex Chat & Care Review Queue</div>
+                <div class="card-subtitle">User messages that were too complicated for auto-resolution and saved for clinical follow-up</div>
+              </div>
+              <span class="badge" style="background: rgba(226,115,150,0.3); color:#FFF;">Graceful Fallback</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User ID / Email</th>
+                    <th>Raw Message Content</th>
+                    <th>Detected Category</th>
+                    <th>Care Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-care-reviews">
                   <!-- Populated by JS -->
                 </tbody>
               </table>
