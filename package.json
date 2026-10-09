@@ -1,0 +1,24 @@
+{
+  "name": "cyclecare-admin-pwa",
+  "version": "1.0.0",
+  "description": "CycleCare Economy Admin Website & PWA with Layered AI Assistance",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx serve . -p 3000",
+    "build": "echo 'Admin PWA ready for static deployment'"
+  },
+  "keywords": [
+    "cyclecare",
+    "admin",
+    "economy",
+    "pwa",
+    "supabase",
+    "dashboard"
+  ],
+  "author": "CycleCare Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

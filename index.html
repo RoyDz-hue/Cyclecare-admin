@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>CycleCare Economy Admin — Control Center & Layered AI</title>
+  
+  <!-- PWA & Meta tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2D1420">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CycleCare Admin">
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js for beautiful analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🌙</div>
+        <div>
+          <div class="brand-title">CycleCare</div>
+          <div class="brand-tag">Economy Admin</div>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li>
+          <a class="nav-item active" data-tab="tab-overview">
+            <span class="nav-icon">📊</span>
+            <span>Overview & Health</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-packages">
+            <span class="nav-icon">💰</span>
+            <span>Coin Packages & Pricing</span>
+            <span class="badge">KES/USD</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-mining">
+            <span class="nav-icon">⛏️</span>
+            <span>Mining & Multipliers</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-artifacts">
+            <span class="nav-icon">💎</span>
+            <span>3D Artifacts & Sinks</span>
+            <span class="badge">3D View</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-ranks">
+            <span class="nav-icon">👑</span>
+            <span>Identity Ranks</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-chats">
+            <span class="nav-icon">💬</span>
+            <span>Guided Chat Rules</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-users">
+            <span class="nav-icon">👥</span>
+            <span>User Management</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-safety">
+            <span class="nav-icon">🛡️</span>
+            <span>Safety & Fraud Check</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-flags">
+            <span class="nav-icon">🚩</span>
+            <span>Feature Flags</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-ai">
+            <span class="nav-icon">✨</span>
+            <span>Layered AI Config</span>
+            <span class="badge" style="background: rgba(226,115,150,0.3); color:#FFF;">AI</span>
+          </a>
+        </li>
+        <li>
+          <a class="nav-item" data-tab="tab-settings">
+            <span class="nav-icon">⚙️</span>
+            <span>Database & Supabase</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="connection-status">
+          <div class="status-dot" id="supabase-status-dot"></div>
+          <span id="supabase-status-text">Connected to Supabase</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport -->
+    <main class="main-viewport">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation">☰</button>
+          <div class="page-title-box">
+            <h1 id="page-title">Economy Overview & Health</h1>
+            <p id="page-subtitle">Real-time circulating supply, sink ratios, and multi-tier controls</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Install PWA Button (Shown if browser supports) -->
+          <button class="btn btn-outline" id="btn-install-pwa" style="display: none;">
+            📲 Install PWA
+          </button>
+          <button class="btn btn-outline" id="btn-ai-drawer-trigger">
+            ✨ AI Economy Copilot
+          </button>
+          <button class="btn btn-gold" id="btn-sync-supabase">
+            ⚡ Sync Backend
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Containers -->
+      <div class="page-container">
+        
+        <!-- ================= TAB: OVERVIEW ================= -->
+        <div class="tab-pane active" id="tab-overview">
+          <!-- Key Metrics -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-box gold">🪙</div>
+              <div class="metric-info">
+                <span class="metric-label">Circulating Coins</span>
+                <span class="metric-value" id="stat-circulating">1,842,500</span>
+                <span class="metric-delta pos">↑ 4.2% daily mint</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-box">🔥</div>
+              <div class="metric-info">
+                <span class="metric-label">Total Coins Burned</span>
+                <span class="metric-value" id="stat-burned">924,310</span>
+                <span class="metric-delta pos">50.1% sink ratio (Healthy)</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-box teal">💰</div>
+              <div class="metric-info">
+                <span class="metric-label">Package Revenue (30d)</span>
+                <span class="metric-value" id="stat-revenue">KES 482,900</span>
+                <span class="metric-delta pos">Hero: KES 49 & 99</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-box purple">👑</div>
+              <div class="metric-info">
+                <span class="metric-label">Supporter & Premium</span>
+                <span class="metric-value" id="stat-supporters">3,420</span>
+                <span class="metric-delta pos">28.4% of active base</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Grid -->
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">📈 Mint vs. Burn Velocity (7-Day)</div>
+                  <div class="card-subtitle">Tracking daily check-in mining vs artifact & cosmetic unlocks</div>
+                </div>
+              </div>
+              <div style="height: 260px; position: relative;">
+                <canvas id="chart-mint-burn"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">🛍️ Sink Popularity Breakdown</div>
+                  <div class="card-subtitle">Distribution of coins spent across 3D artifacts and cosmetics</div>
+                </div>
+              </div>
+              <div style="height: 260px; position: relative;">
+                <canvas id="chart-sink-breakdown"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Economy Events -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">⚡ Real-time Economy Audit Log</div>
+                <div class="card-subtitle">Live verified actions flowing through Supabase Edge Functions</div>
+              </div>
+              <button class="btn btn-outline" id="btn-refresh-logs">Refresh Feed</button>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table" id="table-overview-logs">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User Email</th>
+                    <th>Action</th>
+                    <th>Amount</th>
+                    <th>Multiplier / Tier</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-overview-logs">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: PACKAGES & PRICING ================= -->
+        <div class="tab-pane" id="tab-packages">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">💳 Coin Purchase Packages & Regional Pricing</div>
+                <div class="card-subtitle">All packages and regional pricing are fully controlled here and update the mobile app instantly</div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" id="btn-add-package">+ Add New Package</button>
+                <button class="btn btn-gold" id="btn-save-packages">Save Pricing to Supabase</button>
+              </div>
+            </div>
+
+            <div class="grid-3" id="packages-container">
+              <!-- Dynamically populated package cards -->
+            </div>
+          </div>
+
+          <!-- Regional Currency Conversion Matrix -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🌍 Regional Exchange Rate & Hero Price Overrides</div>
+                <div class="card-subtitle">Configures starter tier prices (e.g. starting from KES 49, KES 99, UGX 1,500, USD $0.99)</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Region Code</th>
+                    <th>Currency</th>
+                    <th>Starter Tier Price</th>
+                    <th>Pocket Reserve</th>
+                    <th>Multiplier vs USD</th>
+                    <th>Auto-Detect Active</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-regional-rates">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: MINING & MULTIPLIERS ================= -->
+        <div class="tab-pane" id="tab-mining">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">⛏️ Daily Check-in & Mining Multipliers</div>
+                  <div class="card-subtitle">Core progression rates Quietly favoring supporters & premium patrons</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Base Daily Check-In Coin Reward</label>
+                <input type="number" class="form-control" id="input-base-reward" value="25" min="1" max="500">
+                <small style="color:var(--text-dim); margin-top:4px;">Base amount awarded when any user logs symptoms or reflections</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Free Tier Multiplier</label>
+                <input type="number" class="form-control" id="input-multiplier-free" value="1.0" step="0.1" readonly>
+                <small style="color:var(--text-dim); margin-top:4px;">Standard cycle mining (Strictly 1.0× by framework rule)</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Supporter Tier Multiplier</label>
+                <input type="number" class="form-control" id="input-multiplier-supporter" value="2.0" step="0.1" min="1.0" max="5.0">
+                <small style="color:var(--text-dim); margin-top:4px;">Default 2.0× multiplier for active patrons</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Premium Tier Multiplier</label>
+                <input type="number" class="form-control" id="input-multiplier-premium" value="3.0" step="0.1" min="1.0" max="10.0">
+                <small style="color:var(--text-dim); margin-top:4px;">Default 3.0× multiplier for sovereignty members</small>
+              </div>
+
+              <button class="btn btn-primary" id="btn-save-mining-rates">Update Multipliers</button>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">🔥 Mining Cooldown & Safety Bounds</div>
+                  <div class="card-subtitle">Edge function verification rules to prevent automated exploitation</div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Daily Mining Limit Per User</label>
+                <input type="number" class="form-control" id="input-max-daily-mining" value="1" min="1" max="5">
+                <small style="color:var(--text-dim); margin-top:4px;">Number of times a user can receive daily check-in coins per 24 hours</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Streak Bonus (Consecutive Days)</label>
+                <input type="number" class="form-control" id="input-streak-bonus" value="10" min="0" max="100">
+                <small style="color:var(--text-dim); margin-top:4px;">Bonus coins granted on achieving a 7-day tracking streak</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">P2P Transfer Daily Cap (Per User)</label>
+                <input type="number" class="form-control" id="input-p2p-daily-cap" value="1000" min="50" max="20000">
+                <small style="color:var(--text-dim); margin-top:4px;">Max Cycle Coins an account can send in a single day</small>
+              </div>
+
+              <button class="btn btn-gold" id="btn-save-mining-bounds">Save Safety Rules</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: 3D ARTIFACTS & SINKS ================= -->
+        <div class="tab-pane" id="tab-artifacts">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">💎 Named 3D Artifacts & Sinks Catalog</div>
+                <div class="card-subtitle">Manage prices, active availability, and test the 3D orbital renderer</div>
+              </div>
+              <button class="btn btn-gold" id="btn-save-catalog">Sync Catalog to App</button>
+            </div>
+
+            <!-- 3D Live Interactive Preview Box -->
+            <div class="artifact-3d-box" id="artifact-canvas-container">
+              <canvas class="artifact-canvas" id="canvas-3d-preview"></canvas>
+              <div class="artifact-overlay">
+                <div>
+                  <span class="artifact-tag" id="preview-artifact-name">artifact_moon • Luminescent Moon</span>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Gentle idle rotation & soft pulsing glow</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button class="btn btn-outline" style="padding: 4px 10px; font-size: 11px;" id="btn-next-preview">Next 3D Asset ↻</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Catalog Items Grid -->
+            <div class="grid-3" id="artifacts-grid" style="margin-top: 24px;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: IDENTITY RANKS ================= -->
+        <div class="tab-pane" id="tab-ranks">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">👑 Identity Rank Thresholds & Aura Colors</div>
+                <div class="card-subtitle">Luxury tier naming only: Lumen, Aurelia, Celestia, Solara, Nocturne, Founder</div>
+              </div>
+              <button class="btn btn-gold" id="btn-save-ranks">Save Ranks</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Rank Title</th>
+                    <th>Min Lifetime Coins</th>
+                    <th>Aura Glow Color</th>
+                    <th>Perks & Privileges</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-ranks">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: GUIDED CHATS ================= -->
+        <div class="tab-pane" id="tab-chats">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">💬 Guided Circles & Access Rules</div>
+                <div class="card-subtitle">Available strictly to Supporter and Premium users • Stored in Supabase</div>
+              </div>
+              <button class="btn btn-primary" id="btn-add-circle">+ Create New Circle</button>
+            </div>
+
+            <div class="grid-3" id="circles-grid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Moderation Queue -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🛡️ Guided Chat Moderation & Safety Queue</div>
+                <div class="card-subtitle">AI-assisted sentiment and toxicity checks keeping spaces soft and supportive</div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Circle</th>
+                    <th>Author</th>
+                    <th>Message Snippet</th>
+                    <th>AI Sentiment</th>
+                    <th>Moderation</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-chat-moderation">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: USER MANAGEMENT ================= -->
+        <div class="tab-pane" id="tab-users">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">👥 User Management & Balance Inspector</div>
+                <div class="card-subtitle">Look up registered users, adjust balances with audit trails, and manage tiers</div>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                <input type="text" class="form-control" placeholder="Search by email or user ID..." id="input-search-users" style="width: 280px;">
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>User Email</th>
+                    <th>Tier</th>
+                    <th>Rank</th>
+                    <th>Coin Balance</th>
+                    <th>Lifetime Earned</th>
+                    <th>Equipped 3D</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-users">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: SAFETY & FRAUD ================= -->
+        <div class="tab-pane" id="tab-safety">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🛡️ Economy Anomaly & Fraud Overview</div>
+                <div class="card-subtitle">Automated Edge verification monitors detecting rapid coin transfer loops or suspicious mining</div>
+              </div>
+              <button class="btn btn-outline" id="btn-run-anomaly-scan">Run AI Audit Scan</button>
+            </div>
+
+            <div class="grid-2">
+              <div class="card" style="background: var(--bg-surface);">
+                <div class="card-title" style="color: var(--success);">✓ Verification Engine Active</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">
+                  All transactions (mine, spend, transfer, purchase) enforce Supabase Edge Function signatures.
+                  Local client balances are treated solely as optimistic caches.
+                </p>
+                <div style="margin-top: 16px; font-size: 12px; color: var(--text-dim);">
+                  <div>• Edge Function: <code>verify-mining</code> (Enforcing 24h cooldown)</div>
+                  <div style="margin-top: 4px;">• Edge Function: <code>transfer-coins</code> (Validating receiver existence & balance)</div>
+                  <div style="margin-top: 4px;">• Edge Function: <code>verify-purchase</code> (Validating receipt & coin credit)</div>
+                </div>
+              </div>
+
+              <div class="card" style="background: var(--bg-surface);">
+                <div class="card-title" style="color: var(--gold);">⚠️ Flagged Activity Queue</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">
+                  No critical fraud detected in the last 24 hours. Normal organic transfer patterns detected.
+                </p>
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                  <span class="badge" style="background: rgba(46,196,182,0.15); color: var(--success); padding: 4px 10px;">0 Blocked IP</span>
+                  <span class="badge" style="background: rgba(243,183,72,0.15); color: var(--gold); padding: 4px 10px;">2 Rapid Transfers Verified</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: FEATURE FLAGS ================= -->
+        <div class="tab-pane" id="tab-flags">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🚩 Real-time Remote Feature Flags</div>
+                <div class="card-subtitle">Instant switches toggling features across Android clients without requiring APK rebuilds</div>
+              </div>
+              <button class="btn btn-gold" id="btn-save-flags">Deploy Flags</button>
+            </div>
+
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Feature Flag Key</th>
+                    <th>Description</th>
+                    <th>Target Audience</th>
+                    <th>Current State</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-flags">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: AI CONFIG ================= -->
+        <div class="tab-pane" id="tab-ai">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">✨ Layered AI Configuration & Tone Prompting</div>
+                <div class="card-subtitle">Fine-tune the supportive, warm AI instructions and economy health recommendations</div>
+              </div>
+              <button class="btn btn-gold" id="btn-save-ai-config">Save AI Instructions</button>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Partiality Tone & Inclusive Language Prompt</label>
+                <textarea class="form-control" id="textarea-tone-prompt" rows="7">You are the supportive, warm, and gentle health intelligence of CycleCare.
+Backend quietly favors supporters and Premium members (higher mining, 3D artifacts, guided chats),
+but UI language must always feel warm, inclusive, and aspirational — never punitive or restrictive.
+Examples of approved tone:
+- "You're building something beautiful here."
+- "Supporters unlock richer spaces and guided conversations."
+- "Continue growing your world — or step into the fuller experience."</textarea>
+                <small style="color: var(--text-dim); margin-top: 4px;">Injected into AI personalization and guided chat assistants</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">AI Economy Copilot Sensitivity</label>
+                <select class="form-control" id="select-ai-sensitivity">
+                  <option value="balanced">Balanced (Suggest adjustments if sink ratio deviates &gt; 10%)</option>
+                  <option value="conservative">Conservative (Focus strictly on long-term coin value preservation)</option>
+                  <option value="aggressive">Growth (Encourage coin distribution and higher engagement)</option>
+                </select>
+
+                <div style="margin-top: 16px;">
+                  <label class="form-label">Gemini API Key (Optional Override)</label>
+                  <input type="password" class="form-control" id="input-gemini-key" placeholder="Enter custom Gemini API key or use server default...">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB: SETTINGS & SUPABASE ================= -->
+        <div class="tab-pane" id="tab-settings">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">⚙️ Supabase Database & Deployment Settings</div>
+                <div class="card-subtitle">Direct REST and Edge Function connection credentials for the CycleCare backend</div>
+              </div>
+              <button class="btn btn-gold" id="btn-save-supabase-config">Test & Save Connection</button>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Supabase URL</label>
+                <input type="text" class="form-control" id="input-supabase-url" value="https://apjqcocxtylsofgxhetb.supabase.co">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Project Reference</label>
+                <input type="text" class="form-control" id="input-project-ref" value="apjqcocxtylsofgxhetb">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Supabase Anon Key</label>
+              <textarea class="form-control" id="input-supabase-anon" rows="3">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwanFjb2N4dHlsc29mZ3hoZXRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNzEzODQsImV4cCI6MjEwNjk0NzM4NH0.b_GXnMvpLSnXqmn35hPGpFnZDdDMFtOZpFoCjWBVR4s</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Supabase Service Role Key (Optional — For Full Admin Bypass)</label>
+              <input type="password" class="form-control" id="input-supabase-service" placeholder="Optional: Enter service_role key to bypass Row-Level-Security in admin mode...">
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+              <button class="btn btn-outline" id="btn-export-config">Export Entire Economy Config (JSON)</button>
+              <button class="btn btn-outline" id="btn-import-config">Import Config</button>
+              <input type="file" id="file-import" style="display: none;" accept=".json">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- AI Copilot Drawer -->
+    <aside class="ai-drawer" id="ai-drawer">
+      <div class="ai-drawer-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">✨</span>
+          <div style="font-weight: 700; font-size: 16px;">AI Economy Copilot</div>
+        </div>
+        <button class="btn btn-outline btn-icon-only" id="btn-close-ai-drawer">✕</button>
+      </div>
+
+      <div class="ai-drawer-body">
+        <div class="ai-recommendation-card">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--gold); font-weight: 700;">Market Insight • Kenya (KES)</div>
+          <div style="font-size: 14px; font-weight: 600;">Hero Price Conversion Surge</div>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            The <b>KES 49</b> Starter package is driving 64% of first-time patron conversions. Consider adding a temporary +15 bonus coin spotlight to test conversion elasticity.
+          </div>
+          <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px; margin-top: 6px;" id="btn-ai-apply-kes-promo">Apply Recommendation</button>
+        </div>
+
+        <div class="ai-recommendation-card">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--primary); font-weight: 700;">Sink Health • 3D Artifacts</div>
+          <div style="font-size: 14px; font-weight: 600;">Rose Obelisk Popularity</div>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Users who reach Aurelia rank spend 800 coins on the Rose Obelisk within 4 days. Economy sink velocity is optimal at 50.1%.
+          </div>
+        </div>
+
+        <div class="ai-recommendation-card">
+          <div style="font-size: 11px; text-transform: uppercase; color: var(--success); font-weight: 700;">Gentle Tone Compliance</div>
+          <div style="font-size: 14px; font-weight: 600;">100% Non-Punitive Copy</div>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            All mobile strings adhere to the Partiality Rule: Free users receive unconditional health care tracking, while rewards invite aspirational growth.
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Modal for User Balance Adjustment -->
+    <div class="modal-backdrop" id="modal-user-edit">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="card-title">Adjust User Profile & Balance</div>
+          <button class="btn btn-outline btn-icon-only" id="btn-close-modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-user-id">
+          <div class="form-group">
+            <label class="form-label">User Email</label>
+            <input type="text" class="form-control" id="edit-user-email" readonly>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Economy Tier</label>
+              <select class="form-control" id="edit-user-tier">
+                <option value="FREE">Free (1.0× Mining)</option>
+                <option value="SUPPORTER">Supporter (2.0× Mining)</option>
+                <option value="PREMIUM">Premium (3.0× Mining)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Identity Rank</label>
+              <select class="form-control" id="edit-user-rank">
+                <option value="LUMEN">Lumen</option>
+                <option value="AURELIA">Aurelia</option>
+                <option value="CELESTIA">Celestia</option>
+                <option value="SOLARA">Solara</option>
+                <option value="NOCTURNE">Nocturne</option>
+                <option value="FOUNDER">Founder</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Coin Balance Adjustment (+ / -)</label>
+            <input type="number" class="form-control" id="edit-user-balance" value="0">
+            <small style="color: var(--text-dim); margin-top: 4px;">Enter amount to add or subtract with an audit reason</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adjustment Reason (Audit Trail)</label>
+            <input type="text" class="form-control" id="edit-user-reason" placeholder="e.g. VIP Gift, Customer Support credit...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" id="btn-cancel-modal">Cancel</button>
+          <button class="btn btn-gold" id="btn-confirm-user-edit">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toast-container"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
