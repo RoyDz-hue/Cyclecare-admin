@@ -25,8 +25,12 @@ import {
   Cloud,
   CheckCircle,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Radio,
+  Bell
 } from 'lucide-react';
+import UserManagement from './components/UserManagement';
+import InHouseMessaging from './components/InHouseMessaging';
 
 const SUPABASE_CONFIG = {
   projectRef: 'apjqcocxtylsofgxhetb',
@@ -52,6 +56,7 @@ export default function App() {
 
   // Real data from Supabase
   const [realProfiles, setRealProfiles] = useState([]);
+  const [realEconomyProfiles, setRealEconomyProfiles] = useState([]);
   const [realTransactions, setRealTransactions] = useState([]);
 
   // Economy state (Loaded from Supabase app_config or fallback default)
@@ -151,9 +156,11 @@ export default function App() {
       // 4. Fetch economy_profiles
       let econExists = false;
       try {
-        const econRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/economy_profiles?select=*&limit=1`, { headers });
+        const econRes = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/economy_profiles?select=*`, { headers });
         if (econRes.ok) {
           econExists = true;
+          const econData = await econRes.json();
+          setRealEconomyProfiles(econData);
         }
       } catch (e) {
         econExists = false;
@@ -281,13 +288,15 @@ export default function App() {
 
   const navItems = [
     { id: 'overview', label: 'Overview & Health', icon: BarChart3 },
+    { id: 'user_management', label: 'User Management', icon: ShieldAlert, badge: `${realProfiles.length} Members` },
+    { id: 'messaging', label: 'In-House Messenger', icon: Radio, badge: 'Official' },
     { id: 'packages', label: 'Coin Packages & Pricing', icon: Coins, badge: 'KES/USD' },
     { id: 'mining', label: 'Mining & Multipliers', icon: Pickaxe },
     { id: 'artifacts', label: '3D Artifacts & Sinks', icon: Gem },
     { id: 'ranks', label: 'Identity Ranks', icon: Crown },
     { id: 'payments', label: 'M-Pesa & Gateway', icon: CreditCard, badge: paymentConfig.activeMpesaProvider },
     { id: 'ai', label: 'Layered AI & Raw Chats', icon: Sparkles, badge: 'Smart' },
-    { id: 'users', label: 'User Care & Activity', icon: Users, badge: `${realProfiles.length} Live` },
+    { id: 'users', label: 'Raw Activity Records', icon: Users },
     { id: 'database', label: 'Supabase Cloud Sync', icon: Database, badge: dbStatus.hasConfigTable ? '100% Synced' : 'Action Required' },
   ];
 
@@ -1071,6 +1080,27 @@ CREATE POLICY "Allow all on payment_transactions" ON public.payment_transactions
                 ))}
               </div>
             </div>
+          )}
+
+          {/* TAB: USER MANAGEMENT (BAN, SUSPEND, PROMOTE, COINS, ARTIFACTS, PENALTIES) */}
+          {activeTab === 'user_management' && (
+            <UserManagement 
+              profiles={realProfiles}
+              economyProfiles={realEconomyProfiles}
+              onRefresh={fetchSupabaseData}
+              supabaseConfig={SUPABASE_CONFIG}
+              showNotification={showNotification}
+            />
+          )}
+
+          {/* TAB: IN-HOUSE MESSENGER (BATCH & CUSTOM SYSTEM NOTIFICATIONS) */}
+          {activeTab === 'messaging' && (
+            <InHouseMessaging 
+              profiles={realProfiles}
+              supabaseConfig={SUPABASE_CONFIG}
+              showNotification={showNotification}
+              onRefresh={fetchSupabaseData}
+            />
           )}
 
           {/* TAB 8: USERS (LIVE SUPABASE PROFILES) */}
