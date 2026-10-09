@@ -1,24 +1,22 @@
 {
-  "name": "cyclecare-admin-pwa",
+  "name": "cyclecare-admin-vite",
+  "private": true,
   "version": "1.0.0",
-  "description": "CycleCare Economy Admin Website & PWA with Layered AI Assistance",
-  "main": "index.html",
+  "type": "module",
   "scripts": {
-    "start": "npx serve . -p 3000",
-    "dev": "npx serve . -p 3000",
-    "build": "echo 'Admin PWA ready for static deployment'"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "cyclecare",
-    "admin",
-    "economy",
-    "pwa",
-    "supabase",
-    "dashboard"
-  ],
-  "author": "CycleCare Team",
-  "license": "MIT",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "lucide-react": "^0.453.0"
+  },
   "devDependencies": {
-    "serve": "^14.2.4"
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.10"
   }
 }
